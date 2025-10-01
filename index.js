@@ -5,6 +5,7 @@ import initModels from "./models/index.js";
 
 import adminRoutes from "./routers/admin.js";
 import productRoutes from "./routers/product.js";
+import cartRoutes from "./routers/cart.js";
 
 const app = express();
 const _PORT = 3000;
@@ -25,10 +26,18 @@ sequelize
         email: "user@localhost",
       });
     }
+    return user;
   })
-  .then((user) => {
+  .then(async (user) => {
+    const userCart = await user.getCart();
+    if (!userCart) {
+      return await user.createCart();
+    }
+    return userCart;
+  })
+  .then((cart) => {
     console.log("Database sync successful.");
-    user ? console.log(user) : null;
+    cart ? console.log(cart) : null;
   })
   .catch((error) => {
     console.error("Database sync failed.", error);
@@ -51,6 +60,7 @@ app.use((req, res, next) => {
 
 app.use("/api/admin/", adminRoutes);
 app.use("/api/product/", productRoutes);
+app.use("/api/cart/", cartRoutes);
 
 app.listen(_PORT, () => {
   console.log(`Server is running on http://localhost:${_PORT}`);
