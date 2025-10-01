@@ -16,7 +16,19 @@ sequelize.models = await initModels();
 sequelize
   .sync()
   .then(() => {
+    return sequelize.models.User.findByPk(1);
+  })
+  .then((user) => {
+    if (!user) {
+      return sequelize.models.User.create({
+        name: "user",
+        email: "user@localhost",
+      });
+    }
+  })
+  .then((user) => {
     console.log("Database sync successful.");
+    user ? console.log(user) : null;
   })
   .catch((error) => {
     console.error("Database sync failed.", error);
@@ -24,6 +36,17 @@ sequelize
 
 app.get("/", (req, res) => {
   res.send("<h1>Web Shop</h1>");
+});
+
+app.use((req, res, next) => {
+  sequelize.models.User.findByPk(1)
+    .then((user) => {
+      req.user = user;
+      next();
+    })
+    .catch((error) => {
+      console.log(error);
+    });
 });
 
 app.use("/api/admin/", adminRoutes);
