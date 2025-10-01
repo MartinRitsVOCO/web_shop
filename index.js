@@ -1,9 +1,10 @@
-import express, { json, urlencoded } from 'express';
+import express, { json, urlencoded } from "express";
 
-// import articleRouter from './routes/article.js';
-// import authorRouter from './routes/author.js';
+import sequelize from "./util/db.js";
+import initModels from "./models/index.js";
 
-import sequelize from './util/db.js';
+import adminRoutes from "./routers/admin.js";
+import productRoutes from "./routers/product.js";
 
 const app = express();
 const _PORT = 3000;
@@ -11,22 +12,23 @@ const _PORT = 3000;
 app.use(json());
 app.use(urlencoded({ extended: true }));
 
-// app.use('/api/article', articleRouter);
-// app.use('/api/author', authorRouter);
-
+sequelize.models = await initModels();
 sequelize
-    .authenticate()
-    .then(() => {
-        console.log("Database connection successful.")
-    })
-    .catch(error => {
-        console.error('Database connection failed.', error)
-    })
+  .sync()
+  .then(() => {
+    console.log("Database sync successful.");
+  })
+  .catch((error) => {
+    console.error("Database sync failed.", error);
+  });
 
-app.get('/', (req, res) => {
-    res.send('<h1>Web Shop</h1>')
-})
+app.get("/", (req, res) => {
+  res.send("<h1>Web Shop</h1>");
+});
+
+app.use("/api/admin/", adminRoutes);
+app.use("/api/product/", productRoutes);
 
 app.listen(_PORT, () => {
-    console.log(`Server is running on http://localhost:${_PORT}`);
+  console.log(`Server is running on http://localhost:${_PORT}`);
 });
