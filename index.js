@@ -6,6 +6,7 @@ import initModels from "./models/index.js";
 import adminRoutes from "./routers/admin.js";
 import productRoutes from "./routers/product.js";
 import cartRoutes from "./routers/cart.js";
+import orderRoutes from "./routers/order.js";
 
 const app = express();
 const _PORT = 3000;
@@ -61,6 +62,7 @@ app.use((req, res, next) => {
 app.use("/api/admin/", adminRoutes);
 app.use("/api/product/", productRoutes);
 app.use("/api/cart/", cartRoutes);
+app.use("/api/order/", orderRoutes);
 
 app.listen(_PORT, () => {
   console.log(`Server is running on http://localhost:${_PORT}`);
